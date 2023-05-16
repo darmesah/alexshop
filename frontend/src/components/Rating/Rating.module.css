@@ -1,0 +1,9 @@
+.rating span svg {
+    position: relative;
+    top: -3px;
+    color: #f8e825;
+}
+
+.rating span {
+    margin: 0.1rem;
+}
