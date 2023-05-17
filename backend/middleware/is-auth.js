@@ -34,3 +34,17 @@ export const isAuth = async (req, res, next) => {
 
   next();
 };
+
+export const isAdmin = (req, res, next) => {
+  try {
+    if (req.user && req.user.isAdmin) {
+      next();
+    } else {
+      const error = new Error("Is not an admin");
+      error.statusCode = 401;
+      throw error;
+    }
+  } catch (error) {
+    next(error);
+  }
+};

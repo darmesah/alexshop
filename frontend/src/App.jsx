@@ -11,6 +11,8 @@ import ShippingPage from "./pages/Shipping";
 import PaymentPage from "./pages/Payment";
 import PlaceOrderPage from "./pages/PlaceOrder";
 import OrderPage from "./pages/Order";
+import UserListPage from "./pages/UserList";
+import UserEditPage from "./pages/UserEdit";
 
 const App = () => {
   return (
@@ -31,6 +33,8 @@ const App = () => {
             { path: "payment", element: <PaymentPage /> },
             { path: "placeorder", element: <PlaceOrderPage /> },
             { path: "order/:id", element: <OrderPage /> },
+            { path: "admin/userlist", element: <UserListPage /> },
+            { path: "admin/user/:id/edit", element: <UserEditPage /> },
           ],
         },
       ])}

@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import productRoutes from "./routes/products.js";
 import userRoutes from "./routes/user.js";
 import orderRoutes from "./routes/order.js";
+import adminRoutes from "./routes/admin.js";
 
 dotenv.config();
 
@@ -17,10 +18,11 @@ app.use(express.json());
 app.use("/api", productRoutes);
 app.use("/api", orderRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use((error, req, res, next) => {
   const status = error.statusCode || 500;
-  const message = error.message;
+  const message = error.message || "An unknown error occurred";
   const data = error.data;
   res.status(status).json({ message, data });
 });
