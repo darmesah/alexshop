@@ -112,3 +112,44 @@ export const updateOrderToPaid = async (req, res, next) => {
     next(error);
   }
 };
+
+// ADMIN - Get all orders
+export const getAllOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.find().populate("user", "name email");
+
+    res.status(201).json(orders);
+  } catch (error) {
+    if (!error.statusCode) {
+      error.statusCode = 500;
+    }
+    next(error);
+  }
+};
+
+// ADMIN - Set order as delivered
+export const updateOrderDelivered = async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    const order = await Order.findById(id);
+
+    if (!order) {
+      const error = new Error("Order not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    order.isDelivered = true;
+    order.deliveredAt = Date.now();
+
+    await order.save();
+
+    res.status(201).json({ message: "Order delivered successfully" });
+  } catch (error) {
+    if (!error.statusCode) {
+      error.statusCode = 500;
+    }
+    next(error);
+  }
+};

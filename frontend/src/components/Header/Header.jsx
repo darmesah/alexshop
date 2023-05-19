@@ -5,6 +5,7 @@ import { FaShoppingCart, FaUserAlt } from "react-icons/fa";
 
 import classes from "./Header.module.css";
 import { logoutAction } from "../../store/auth-actions";
+import SearchBox from "./SearchBox";
 
 const Header = () => {
   const dispatch = useDispatch();
@@ -24,6 +25,7 @@ const Header = () => {
           </LinkContainer>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
+            <SearchBox />
             <Nav className="ml-auto">
               <LinkContainer to="/cart">
                 <Nav.Link>

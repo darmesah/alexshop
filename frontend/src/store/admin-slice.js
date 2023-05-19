@@ -6,8 +6,10 @@ const adminSlice = createSlice({
     users: [],
     user: {},
     deleteSuccess: "",
+    createdProduct: "",
     updateSuccess: "",
     forceRefresh: 0,
+    orders: [],
   },
   reducers: {
     setUsers(state, action) {
@@ -24,6 +26,12 @@ const adminSlice = createSlice({
     },
     setUpdateSuccess(state, action) {
       state.updateSuccess = action.payload;
+    },
+    setCreatedProduct(state, action) {
+      state.createdProduct = action.payload;
+    },
+    setOrders(state, action) {
+      state.orders = action.payload;
     },
   },
 });

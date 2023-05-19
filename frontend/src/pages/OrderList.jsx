@@ -3,88 +3,83 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button, Table } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
-import { FaCheck, FaTimes, FaEdit, FaTrash } from "react-icons/fa";
+import { FaTimes } from "react-icons/fa";
 
 import Message from "../components/UIElements/Message";
 import Loader from "../components/UIElements/Loader";
-import { getUsersAction, removeUserAction } from "../store/admin-actions";
+import { getOrdersAction } from "../store/admin-actions";
 
-const UserListPage = () => {
+const OrderListPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const userInfo = useSelector((state) => state.auth.userInfo);
 
-  const { users, deleteSuccess, forceRefresh } = useSelector(
-    (state) => state.admin
-  );
+  const { orders } = useSelector((state) => state.admin);
   const { isLoading, errorMsg } = useSelector((state) => state.ui);
 
   useEffect(() => {
     if (userInfo && userInfo.isAdmin === true) {
-      dispatch(getUsersAction());
+      dispatch(getOrdersAction());
     } else {
       navigate("/", { replace: true });
     }
-  }, [dispatch, navigate, userInfo, forceRefresh]);
-
-  const deleteHandler = (id) => {
-    if (window.confirm("Are you sure")) {
-      dispatch(removeUserAction(id));
-    }
-  };
+  }, [dispatch, navigate, userInfo]);
 
   return (
     <>
-      <h1>Users</h1>
+      <h1>Orders</h1>
       {isLoading ? (
         <Loader />
       ) : errorMsg ? (
         <Message variant="danger">{errorMsg}</Message>
       ) : (
         <>
-          {deleteSuccess && (
-            <Message variant="success">{deleteSuccess}</Message>
-          )}
-
           <Table striped bordered hover responsive className="table-sm">
             <thead>
               <tr>
                 <th>ID</th>
                 <th>NAME</th>
                 <th>EMAIL</th>
-                <th>ADMIN</th>
+                <th>DATE</th>
+                <th>TOTAL</th>
+                <th>PAID</th>
+                <th>DELIVERED</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
-                <tr key={user._id}>
-                  <td>{user._id}</td>
-                  <td>{user.name}</td>
+              {orders.map((order) => (
+                <tr key={order._id}>
+                  <td>{order._id}</td>
+                  <td>{order.user.name}</td>
                   <td>
-                    <a href={`mailto:${user.email}`}>{user.email}</a>
+                    <a href={`mailto:${order.user.email}`}>
+                      {order.user.email}
+                    </a>
                   </td>
+                  <td>{order.createdAt.substring(0, 10)}</td>
+                  <td>{order.totalPrice}</td>
                   <td>
-                    {user.isAdmin ? (
-                      <FaCheck style={{ color: "green" }} />
+                    {order.isPaid ? (
+                      order.paidAt.substring(0, 10)
                     ) : (
                       <FaTimes style={{ color: "red" }} />
                     )}
                   </td>
                   <td>
-                    <LinkContainer to={`/admin/user/${user._id}/edit`}>
+                    {order.isDelivered ? (
+                      order.deliveredAt.substring(0, 10)
+                    ) : (
+                      <FaTimes style={{ color: "red" }} />
+                    )}
+                  </td>
+                  <td>
+                    <LinkContainer to={`/order/${order._id}`}>
                       <Button variant="light" className="btn-sm">
-                        <FaEdit />
+                        DETAILS
                       </Button>
                     </LinkContainer>
-                    <Button
-                      variant="danger"
-                      className="btn-sm"
-                      onClick={() => deleteHandler(user._id)}
-                    >
-                      <FaTrash />
-                    </Button>
                   </td>
                 </tr>
               ))}
@@ -96,4 +91,4 @@ const UserListPage = () => {
   );
 };
 
-export default UserListPage;
+export default OrderListPage;

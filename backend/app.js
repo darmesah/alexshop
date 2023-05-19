@@ -1,3 +1,5 @@
+import path from "path";
+import fs from "fs";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -15,14 +17,29 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const __dirname = path.resolve();
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 app.use("/api", productRoutes);
 app.use("/api", orderRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 
+app.use((req, res, next) => {
+  const error = new Error("Could not find this route");
+  error.statusCode = 404;
+  throw error;
+});
+
 app.use((error, req, res, next) => {
+  if (req.file) {
+    fs.unlink(req.file.path, (err) => {
+      console.log(err);
+    });
+  }
+
   const status = error.statusCode || 500;
-  const message = error.message || "An unknown error occurred";
+  const message = error.message;
   const data = error.data;
   res.status(status).json({ message, data });
 });

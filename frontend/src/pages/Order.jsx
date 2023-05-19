@@ -1,25 +1,34 @@
 import { useEffect, useState } from "react";
 import { PayPalButton } from "react-paypal-button-v2";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
-import { Row, Col, ListGroup, Image, Card } from "react-bootstrap";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { Row, Col, ListGroup, Image, Card, Button } from "react-bootstrap";
 
 import Message from "../components/UIElements/Message";
 import { getOrderDetailsAction, orderPayAction } from "../store/order-action";
 import Loader from "../components/UIElements/Loader";
 import { orderActions } from "../store/order-slice";
+import { deliverOrderAction } from "../store/admin-actions";
+import { adminActions } from "../store/admin-slice";
 
 const OrderPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const order = useSelector((state) => state.order.order);
-  const { isLoading: loadingPay } = useSelector((state) => state.ui);
+  const { userInfo } = useSelector((state) => state.auth);
+  const { deleteSuccess: successDeliver } = useSelector((state) => state.admin);
+  const { isLoading: loadingPay, isLoading } = useSelector((state) => state.ui);
   const { success: successPay } = useSelector((state) => state.order.orderPay);
 
   const [sdkReady, setSdkReady] = useState(false);
 
   useEffect(() => {
+    if (!userInfo) {
+      navigate("/login", { replace: true });
+    }
+
     const addPayPalScript = () => {
       const script = document.createElement("script");
       script.type = "text/javascript";
@@ -31,7 +40,8 @@ const OrderPage = () => {
       document.body.appendChild(script);
     };
 
-    if (!order || successPay) {
+    if (!order || successPay || successDeliver) {
+      dispatch(adminActions.setSuccess(""));
       dispatch(orderActions.payReset());
       dispatch(getOrderDetailsAction(id));
     } else if (!order.isPaid) {
@@ -41,11 +51,14 @@ const OrderPage = () => {
         setSdkReady(true);
       }
     }
-  }, [dispatch, id, order, successPay]);
+  }, [dispatch, id, navigate, order, successDeliver, successPay, userInfo]);
 
   const successPaymentHandler = (paymentResult) => {
-    console.log(paymentResult);
     dispatch(orderPayAction(id, paymentResult));
+  };
+
+  const deliverHandler = () => {
+    dispatch(deliverOrderAction(id));
   };
 
   if (order) {
@@ -170,6 +183,22 @@ const OrderPage = () => {
                     )}
                   </ListGroup.Item>
                 )}
+
+                {isLoading && <Loader />}
+                {userInfo &&
+                  userInfo.isAdmin &&
+                  order.isPaid &&
+                  !order.isDelivered && (
+                    <ListGroup.Item>
+                      <Button
+                        type="button"
+                        className="btn btn-block"
+                        onClick={deliverHandler}
+                      >
+                        Mark As Delivered
+                      </Button>
+                    </ListGroup.Item>
+                  )}
               </ListGroup>
             </Card>
           </Col>
