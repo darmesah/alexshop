@@ -117,7 +117,7 @@ const OrderPage = () => {
                         <Row>
                           <Col md={1}>
                             <Image
-                              src={item.image}
+                              src={`${process.env.REACT_APP_BACKEND_IMAGES}/${item.image}`}
                               alt={item.name}
                               fluid
                               rounded
